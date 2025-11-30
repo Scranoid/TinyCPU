@@ -1,6 +1,6 @@
 import Foundation
 
-/// Represents a simple TinyCPU instruction.
+/// Represents a simple TinyCPU instruction.(saare instructions yaha explicitly comments ke through define kiye hai)
 enum Instruction: Equatable {
     case loadA(Int)     // LOAD A, value
     case loadB(Int)     // LOAD B, value
@@ -10,7 +10,7 @@ enum Instruction: Equatable {
     case jump(Int)      // PC = address
     case halt           // Stops execution
     
-    /// Human-readable name for UI display.
+    /// Human-readable name for UI display.(proper naming scheme for instructions so that ofc it doesnt confuse the users)
     var name: String {
         switch self {
         case .loadA: return "LOAD A"

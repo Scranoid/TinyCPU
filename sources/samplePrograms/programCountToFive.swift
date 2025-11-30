@@ -1,5 +1,5 @@
 import Foundation
-
+/// This is the definition of a sample program that the user can simulate through the UI on tinyCPU
 let programCountToFive = ProgramDefinition(
     name: "Count to Five Loop",
     instructions: [
@@ -10,3 +10,4 @@ let programCountToFive = ProgramDefinition(
         .halt
     ]
 )
+ 

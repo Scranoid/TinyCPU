@@ -4,7 +4,7 @@ import Foundation
 /// Publishes register values and small UI hints (aluActive, cycleID) for the SwiftUI layer.
 final class CPUModel: ObservableObject {
 
-    // MARK: - Registers & state
+    // MARK: - Registers & state (used for the main computation here)
     @Published var registerA: Int = 0
     @Published var registerB: Int = 0
     @Published var pc: Int = 0
@@ -55,7 +55,7 @@ final class CPUModel: ObservableObject {
             self.ir = fetched
         }
 
-        // Decode & Execute (perform state changes on main queue to be UI-safe)
+        // Decode & Execute (performed state changes on main queue to be UI-safe)
         switch fetched {
 
         case .loadA(let value):
@@ -73,7 +73,7 @@ final class CPUModel: ObservableObject {
             }
 
         case .storeA(let index):
-            // store current A value into memory as a LOAD A instruction (keeps representation consistent)
+            // store current A value into memory as a LOAD A instruction (keeps representation consistent)[likha to hai but I guess It'll break at some places as well]
             DispatchQueue.main.async {
                 self.memory.write(.loadA(self.registerA), at: index)
                 self.pc += 1
@@ -83,7 +83,7 @@ final class CPUModel: ObservableObject {
             }
 
         case .add:
-            // ALU action: play sound + flash + compute, then clear flash
+            // ALU action: play sound + flash + compute, then clear flash(will try to use default apple sounds to simulate a premium feel)
             DispatchQueue.main.async {
                 SoundManager.shared.play("alu.wav")
                 self.aluActive = true
@@ -91,7 +91,7 @@ final class CPUModel: ObservableObject {
                 self.pc += 1
                 self.cycleID = UUID()
             }
-            // turn off ALU active after a short delay so animation can play
+            // turn off ALU active after a short delay so animation can play(I've used multiple animations here so that the fluidity is maintained here)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self.aluActive = false
             }

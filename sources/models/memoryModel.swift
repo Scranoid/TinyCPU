@@ -11,7 +11,7 @@ final class MemoryModel {
         self.cells = Array(repeating: .halt, count: size)
     }
     
-    /// Load a full program into memory (starting at index 0)
+    /// Load a full program into memory (starting at index 0)[this basically is the beginning of the program]
     func load(program: [Instruction]) {
         for i in 0..<program.count {
             if i < cells.count {

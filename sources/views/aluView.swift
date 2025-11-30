@@ -1,5 +1,6 @@
 import SwiftUI
-
+/// This is for the view pane of the ALU component in the tinyCPU simulator
+/// same for all other view panes of the entire Views directory
 struct ALUView: View {
     @Environment(\.tilt) private var tilt
     @EnvironmentObject private var theme: ThemeManager
