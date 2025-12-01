@@ -1,5 +1,6 @@
 import AVFoundation
-
+///we basically have to import three sounds responsible for carrying most of the operations in the application
+/// It'll result in trimodal sound design:  Three design principles must be followed being robustness , simplicity and soothness{might sound weird but its important in these niche ui cases}
 class SoundManager {
     static let shared = SoundManager()
     private var player: AVAudioPlayer?
