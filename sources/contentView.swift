@@ -14,70 +14,68 @@ struct ContentView: View {
             VStack(spacing: 18)
                 .animation(.easeInOut(duration: 0.25), value: cpu.cycleID)
             {
-                // TITLE
-                Text("tiny cpu")
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .padding(.top, 12)
-
-                // THEME TOGGLE BUTTON
+                // TITLE + THEME TOGGLE
                 HStack {
+                    Text("tiny cpu")
+                        .font(.system(size: 24, weight: .semibold, design: .rounded))
+
                     Spacer()
 
                     Button {
-                        withAnimation(.easeInOut(duration: 0.35)) {
-                            theme.isDarkMode.toggle()
-                        }
+                        theme.toggle()
                     } label: {
                         Image(systemName: theme.isDarkMode ? "sun.max.fill" : "moon.fill")
-                            .font(.system(size: 18, weight: .semibold))
-                            .padding(10)
+                            .font(.system(size: 16, weight: .semibold))
+                            .padding(8)
                             .background(.ultraThinMaterial)
                             .cornerRadius(10)
                             .dynamicShadow(tiltX: tilt.tiltX, tiltY: tilt.tiltY)
                     }
                 }
                 .padding(.horizontal)
+                .padding(.top, 10)
 
-                // PROGRAM PICKER GRID
+                // PROGRAM PICKER
                 ProgramPickerView(
                     programs: ProgramLoader.allPrograms
                 ) { selected in
-                    cpu.memory.load(program: selected.instructions)
-                    cpu.reset()
+                    cpu.loadProgram(selected.instructions)
                 }
-                .padding(.bottom, 4)
+                .padding(.horizontal)
 
-                // REGISTERS ROW
+                // REGISTERS
                 HStack(spacing: 12) {
                     RegisterView(title: "A", value: String(cpu.registerA))
                     RegisterView(title: "B", value: String(cpu.registerB))
                     RegisterView(title: "PC", value: String(cpu.pc))
+                    // IR with slide transition: id keyed to instruction name
                     RegisterView(title: "IR", value: cpu.ir.name)
+                        .id(cpu.ir.name)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .bottom).combined(with: .opacity),
+                            removal: .move(edge: .top).combined(with: .opacity)
+                        ))
                 }
                 .padding(.horizontal)
 
                 // MEMORY VIEW
-                MemoryView(
-                    cells: cpu.memory.cells,
-                    currentPC: cpu.pc
-                )
-                .frame(height: 80)
-                .padding(.horizontal)
+                MemoryView(cells: cpu.memory.cells, currentPC: cpu.pc)
+                    .frame(height: 80)
+                    .padding(.horizontal)
 
-                // ALU
-                ALUView(
-                    active: cpu.aluActive,
-                    operationName: cpu.ir.name
-                )
-                .frame(width: 140, height: 140)
+                // ALU with circular ring
+                ZStack {
+                    aluRingView(active: cpu.aluActive)
+                        .frame(width: 170, height: 170)
+
+                    ALUView(active: cpu.aluActive, operationName: cpu.ir.name)
+                        .frame(width: 140, height: 140)
+                }
                 .padding(.vertical, 4)
 
                 // EXECUTION TIMELINE
-                ExecutionTimelineView(
-                    cells: cpu.memory.cells,
-                    currentPC: cpu.pc
-                )
-                .padding(.horizontal)
+                ExecutionTimelineView(cells: cpu.memory.cells, currentPC: cpu.pc)
+                    .padding(.horizontal)
 
                 // CONTROL PANEL
                 ControlPanelView(
@@ -90,16 +88,18 @@ struct ContentView: View {
                         cpu.reset()
                     }
                 )
-                .padding(.bottom, 20)
+                .padding(.bottom, 18)
+                .padding(.horizontal)
 
-                Spacer()
+                Spacer(minLength: 6)
             }
-            .padding()
+            .padding(.vertical, 8)
+            .environmentObject(theme)
         }
     }
 }
 
-struct contentView_Previews: PreviewProvider {
+struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(ThemeManager())

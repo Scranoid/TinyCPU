@@ -9,17 +9,12 @@ struct ProgramPickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-
             Text("Choose Program")
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundColor(theme.isDarkMode ? .white : .black)
                 .padding(.horizontal, 4)
 
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 14),
-                GridItem(.flexible(), spacing: 14)
-            ], spacing: 14) {
-
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
                 ForEach(programs, id: \.name) { program in
                     Button {
                         onPick(program)
@@ -31,24 +26,19 @@ struct ProgramPickerView: View {
 
                             Text("\(program.instructions.count) steps")
                                 .font(.system(size: 12, weight: .regular, design: .rounded))
-                                .foregroundColor(theme.isDarkMode
-                                    ? .white.opacity(0.6)
-                                    : .black.opacity(0.6))
+                                .foregroundColor(theme.isDarkMode ? .white.opacity(0.6) : .black.opacity(0.6))
                         }
                         .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.ultraThinMaterial)
                         .cornerRadius(16)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.blue.opacity(0.25), lineWidth: 1)
-                        )
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.accentBlue.opacity(0.22), lineWidth: 1))
                         .dynamicShadow(tiltX: tilt.tiltX, tiltY: tilt.tiltY)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.vertical, 6)
     }
 }

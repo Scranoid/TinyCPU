@@ -1,6 +1,5 @@
 import SwiftUI
-/// This is for the view pane of the ALU component in the tinyCPU simulator
-/// same for all other view panes of the entire Views directory
+
 struct ALUView: View {
     @Environment(\.tilt) private var tilt
     @EnvironmentObject private var theme: ThemeManager
@@ -10,21 +9,18 @@ struct ALUView: View {
 
     var body: some View {
         ZStack {
+            // Base liquid glass circle
             Circle()
                 .fill(.ultraThinMaterial)
                 .overlay(
                     Circle()
                         .stroke(
-                            active ? Color.blue.opacity(0.7) :
-                            theme.isDarkMode ? Color.white.opacity(0.25) :
-                            Color.black.opacity(0.25),
-                            lineWidth: active ? 3 : 1
+                            active ? Color.accentBlue.opacity(0.9) :
+                                (theme.isDarkMode ? Color.white.opacity(0.22) : Color.black.opacity(0.16)),
+                            lineWidth: active ? 3.0 : 1.0
                         )
                 )
-                .shadow(color: active
-                        ? Color.blue.opacity(0.35)
-                        : .clear,
-                        radius: active ? 14 : 8)
+                .shadow(color: active ? Color.accentBlue.opacity(0.35) : .clear, radius: active ? 14 : 8)
                 .scaleEffect(active ? 1.05 : 1.0)
 
             VStack(spacing: 4) {
@@ -34,10 +30,11 @@ struct ALUView: View {
 
                 Text(operationName)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
-                    .foregroundColor(theme.isDarkMode ? .white.opacity(0.8) : .black.opacity(0.8))
+                    .foregroundColor(theme.isDarkMode ? .white.opacity(0.85) : .black.opacity(0.85))
+                    .opacity(0.9)
             }
         }
         .dynamicShadow(tiltX: tilt.tiltX, tiltY: tilt.tiltY)
-        .animation(.easeInOut(duration: 0.25), value: active)
+        .animation(.easeInOut(duration: 0.22), value: active)
     }
 }

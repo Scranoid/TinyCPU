@@ -4,6 +4,9 @@ struct ControlPanelView: View {
     var onNext: () -> Void
     var onReset: () -> Void
 
+    @Environment(\.tilt) private var tilt
+    @EnvironmentObject private var theme: ThemeManager
+
     var body: some View {
         HStack(spacing: 16) {
             Button(action: onNext) {
@@ -13,6 +16,7 @@ struct ControlPanelView: View {
                     .padding(.horizontal, 20)
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color.accentBlue)
 
             Button(action: onReset) {
                 Text("Reset")
@@ -22,5 +26,6 @@ struct ControlPanelView: View {
             }
             .buttonStyle(.bordered)
         }
+        .dynamicShadow(tiltX: tilt.tiltX, tiltY: tilt.tiltY)
     }
 }

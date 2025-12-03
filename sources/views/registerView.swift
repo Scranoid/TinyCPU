@@ -12,7 +12,7 @@ struct RegisterView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundColor(theme.isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
+                .foregroundColor(theme.isDarkMode ? .white.opacity(0.85) : .black.opacity(0.85))
 
             Text(value)
                 .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -22,11 +22,9 @@ struct RegisterView: View {
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(theme.isDarkMode
-                                ? Color.white.opacity(0.25)
-                                : Color.black.opacity(0.15),
-                                lineWidth: 0.5)
+                        .stroke(theme.isDarkMode ? Color.white.opacity(0.18) : Color.black.opacity(0.12), lineWidth: 0.5)
                 )
+                // general small pulse on value change
                 .scaleEffect(animatePulse ? 1.05 : 1.0)
                 .animation(.easeOut(duration: 0.18), value: value)
                 .onChange(of: value) { _ in
@@ -35,8 +33,20 @@ struct RegisterView: View {
                         animatePulse = false
                     }
                 }
+                // PC-specific stronger pulse & halo
+                .overlay(
+                    Group {
+                        if title == "PC" && animatePulse {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.blue.opacity(0.45), lineWidth: 2)
+                                .blur(radius: 6)
+                        }
+                    }
+                )
+
         }
         .padding(8)
+        // apply dynamic shadow to the whole register card
         .dynamicShadow(tiltX: tilt.tiltX, tiltY: tilt.tiltY)
     }
 }
