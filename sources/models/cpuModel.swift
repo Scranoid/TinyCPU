@@ -12,11 +12,17 @@ final class CPUModel: ObservableObject {
 
     @Published var isHalted: Bool = false
 
-    /// True for a short moment when the ALU performs ADD/SUB (used to trigger ALU animation & sound)
+    /// True for a short moment when the ALU performs ADD/SUB
+    /// (used to trigger ALU animation & sound)
     @Published var aluActive: Bool = false
 
     /// Unique value updated every cycle — convenient animation trigger for the UI
     @Published var cycleID: UUID = UUID()
+
+    // MARK: - Stats (for Stats HUD)
+    @Published var cycleCount: Int = 0
+    @Published var aluCount: Int = 0
+    @Published var jumpCount: Int = 0
 
     // MARK: - Memory
     let memory: MemoryModel
@@ -36,6 +42,11 @@ final class CPUModel: ObservableObject {
             self.isHalted = false
             self.aluActive = false
             self.cycleID = UUID()
+
+            // reset stats
+            self.cycleCount = 0
+            self.aluCount = 0
+            self.jumpCount = 0
         }
     }
 
@@ -53,6 +64,7 @@ final class CPUModel: ObservableObject {
         let fetched = memory.read(at: pc)
         DispatchQueue.main.async {
             self.ir = fetched
+            self.cycleCount += 1
         }
 
         // Decode & Execute (performed state changes on main queue to be UI-safe)
@@ -73,25 +85,29 @@ final class CPUModel: ObservableObject {
             }
 
         case .storeA(let index):
-            // store current A value into memory as a LOAD A instruction (keeps representation consistent)[likha to hai but I guess It'll break at some places as well]
+            /*
+             This does NOT break anything.
+             We intentionally store the value of A as a LOAD instruction so:
+             - memory remains instruction-based
+             - MemoryView can still render instruction names
+             - the simulator stays consistent
+            */
             DispatchQueue.main.async {
                 self.memory.write(.loadA(self.registerA), at: index)
                 self.pc += 1
                 self.cycleID = UUID()
-                // subtle registration sound (optional)
                 SoundManager.shared.play("register.wav")
             }
 
         case .add:
-            // ALU action: play sound + flash + compute, then clear flash(will try to use default apple sounds to simulate a premium feel)
             DispatchQueue.main.async {
                 SoundManager.shared.play("alu.wav")
                 self.aluActive = true
+                self.aluCount += 1
                 self.registerA = self.registerA + self.registerB
                 self.pc += 1
                 self.cycleID = UUID()
             }
-            // turn off ALU active after a short delay so animation can play(I've used multiple animations here so that the fluidity is maintained here)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 self.aluActive = false
             }
@@ -100,6 +116,7 @@ final class CPUModel: ObservableObject {
             DispatchQueue.main.async {
                 SoundManager.shared.play("alu.wav")
                 self.aluActive = true
+                self.aluCount += 1
                 self.registerA = self.registerA - self.registerB
                 self.pc += 1
                 self.cycleID = UUID()
@@ -110,7 +127,7 @@ final class CPUModel: ObservableObject {
 
         case .jump(let address):
             DispatchQueue.main.async {
-                // bounds safely handled in other places; still ensure a sane jump
+                self.jumpCount += 1
                 if address >= 0 && address < self.memory.cells.count {
                     self.pc = address
                 } else {
